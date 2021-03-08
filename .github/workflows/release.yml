@@ -18,6 +18,7 @@ jobs:
           repository: 'OpenTabletDriver/OpenTabletDriver'
           path: 'src/OpenTabletDriver'
       - name: Checkout OpenTabletDriver-udev Repository
+        uses: actions/checkout@v2
         with:
           repository: 'OpenTabletDriver/OpenTabletDriver-udev'
           path: 'src/OpenTabletDriver-udev'
