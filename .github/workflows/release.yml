@@ -27,11 +27,20 @@ jobs:
         with:
           dotnet-version: 5.0.x
       - name: Debian Build
-        run: ./Debian/package
+        run: |
+          cd ./Debian
+          ./package
+          cd ..
       - name: Generic Linux Build
-        run: ./Linux/package
+        run: |
+          cd ./Linux
+          ./package
+          cd ..
       - name: MacOS Build
-        run: ./MacOS/package
+        run: |
+          cd ./MacOS
+          ./package
+          cd ..
       - name: Upload assets for tag
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -61,7 +70,9 @@ jobs:
           dotnet-version: 5.0.x
       - name: Package
         run: |
-          ./Windows/package.ps1
+          cd ./Windows
+          package.ps1
+          cd ..
       - name: Upload assets for tag
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
