@@ -25,8 +25,8 @@ jobs:
           submodules: false
       - name: Link modules
         env:
-          - source: ${GITHUB_WORKSPACE}/src/OpenTabletDriver
-          - target: ${GITHUB_WORKSPACE}/src/OpenTabletDriver-udev/.modules/OpenTabletDriver
+          source: ${GITHUB_WORKSPACE}/src/OpenTabletDriver
+          target: ${GITHUB_WORKSPACE}/src/OpenTabletDriver-udev/.modules/OpenTabletDriver
         run: |
           rm -rf $target; ln -s $source $target
           if [ -e $target ]; then echo "Successfully linked."; else exit 1; fi
