@@ -2,7 +2,7 @@ name: Release
 
 on:
   release:
-    types: [published, edited]
+    types: [published]
 jobs:
   unix:
     runs-on: ubuntu-latest
@@ -22,18 +22,16 @@ jobs:
         with:
           repository: 'OpenTabletDriver/OpenTabletDriver-udev'
           path: 'src/OpenTabletDriver-udev'
-      - name: Link modules
-        run: ln -s $PWD/src/OpenTabletDriver $PWD/src/OpenTabletDriver-udev/.modules/OpenTabletDriver
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.x
       - name: Debian Build
-        run: ./Debian/package build
+        run: ./Debian/package
       - name: Generic Linux Build
-        run: ./Linux/package build
+        run: ./Linux/package
       - name: MacOS Build
-        run: ./MacOS/package build
+        run: ./MacOS/package
       - name: Upload assets for tag
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -63,7 +61,7 @@ jobs:
           dotnet-version: 5.0.x
       - name: Package
         run: |
-          ./Windows/package.ps1 build
+          ./Windows/package.ps1
       - name: Upload assets for tag
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
