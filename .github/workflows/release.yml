@@ -24,10 +24,12 @@ jobs:
           path: 'src/OpenTabletDriver-udev'
           submodules: false
       - name: Link modules
+        env:
+          - source: ${GITHUB_WORKSPACE}/src/OpenTabletDriver
+          - target: ${GITHUB_WORKSPACE}/src/OpenTabletDriver-udev/.modules/OpenTabletDriver
         run: |
-          ln -s ${GITHUB_WORKSPACE}/src/OpenTabletDriver ${GITHUB_WORKSPACE}/src/OpenTabletDriver-udev/.modules/OpenTabletDriver
-          if [ -h ${GITHUB_WORKSPACE}/src/OpenTabletDriver-udev/.modules/OpenTabletDriver ]; then echo "Successfully linked."; else exit 1; fi
-          ls -l ${GITHUB_WORKSPACE}/src/OpenTabletDriver-udev/.modules/OpenTabletDriver
+          rm -rf $target; ln -s $source $target
+          if [ -e $target ]; then echo "Successfully linked."; else exit 1; fi
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
