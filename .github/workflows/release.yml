@@ -26,6 +26,7 @@ jobs:
         run: |
           ln -s ${GITHUB_WORKSPACE}/src/OpenTabletDriver ${GITHUB_WORKSPACE}/src/OpenTabletDriver-udev/.modules/OpenTabletDriver
           if [ -e ${GITHUB_WORKSPACE}/src/OpenTabletDriver-udev/.modules/OpenTabletDriver ]; then echo "Successfully linked."; else exit 1; fi
+          ls ${GITHUB_WORKSPACE}/src/OpenTabletDriver-udev/.modules/OpenTabletDriver
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
