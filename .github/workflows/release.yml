@@ -10,7 +10,7 @@ on:
 jobs:
   linux:
     runs-on: ubuntu-latest
-    name: Linux Release
+    name: Linux Build
     steps:
       - name: Checkout Packaging Repository
         uses: actions/checkout@v2
@@ -43,7 +43,7 @@ jobs:
           path: ./Linux/OpenTabletDriver.linux-x64.tar.gz
   debian:
     runs-on: ubuntu-latest
-    name: Debian Release
+    name: Debian Build
     steps:
       - name: Checkout Packaging Repository
         uses: actions/checkout@v2
@@ -78,7 +78,7 @@ jobs:
           path: ./Debian/OpenTabletDriver.deb
   redhat:
     runs-on: ubuntu-latest
-    name: Red Hat Linux
+    name: Red Hat Build
     steps:
       - name: Checkout Packaging Repository
         uses: actions/checkout@v2
@@ -96,12 +96,12 @@ jobs:
       - name: Install Red Hat Dependencies
         run: |
           PACKAGES=$(mktemp -d)
-          wget "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/rpm-common_4.14.1+dfsg1-2_amd64.deb" -O $PACKAGES/
-          wget "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpm8_4.14.1+dfsg1-2_amd64.deb" -O $PACKAGES/
-          wget "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpmio8_4.14.1+dfsg1-2_amd64.deb" -O $PACKAGES/
-          wget "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpmbuild8_4.14.1+dfsg1-2_amd64.deb" -O $PACKAGES/
+          # wget "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/rpm-common_4.14.1+dfsg1-2_amd64.deb" -P $PACKAGES/
+          # wget "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpm8_4.14.1+dfsg1-2_amd64.deb" -P $PACKAGES/
+          # wget "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpmio8_4.14.1+dfsg1-2_amd64.deb" -P $PACKAGES/
+          # wget "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpmbuild8_4.14.1+dfsg1-2_amd64.deb" -P $PACKAGES/
           sudo apt update
-          sudo apt install $PACKAGES/*.deb -y
+          sudo apt install rpm-common librpm8 librpmio8 librpmbuild8
       - name: Red Hat Build
         run: ./Redhat/package
       - name: Upload release assets
@@ -120,7 +120,7 @@ jobs:
           path: ./Redhat/OpenTabletDriver.rpm
   macos:
     runs-on: ubuntu-latest
-    name: MacOS Release
+    name: MacOS Build
     steps:
       - name: Checkout Packaging Repository
         uses: actions/checkout@v2
@@ -153,7 +153,7 @@ jobs:
           path: ./MacOS/OpenTabletDriver.osx-x64.tar.gz
   windows:
     runs-on: windows-latest
-    name: Windows Release
+    name: Windows Build
     steps:
       - name: Checkout Packaging Repository
         uses: actions/checkout@v2
