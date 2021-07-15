@@ -1,4 +1,4 @@
-name: Release
+name: Build
 
 on:
   release:
@@ -8,7 +8,40 @@ on:
       - master
     pull_request:
 jobs:
-  unix:
+  linux:
+    runs-on: ubuntu-latest
+    name: Linux Release
+    steps:
+      - name: Checkout Packaging Repository
+        uses: actions/checkout@v2
+        with:
+          repository: 'OpenTabletDriver/OpenTabletDriver.Packaging'
+      - name: Checkout OpenTabletDriver Repository
+        uses: actions/checkout@v2
+        with:
+          repository: 'OpenTabletDriver/OpenTabletDriver'
+          path: 'src/OpenTabletDriver'
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Linux Build
+        run: ./Linux/package
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            ./Linux/OpenTabletDriver.linux-x64.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@master
+        if: ! startsWith(github.ref, 'refs/tags/')
+        with:
+          name: OpenTabletDriver.linux-x64.tar.gz
+          path: ./Linux/OpenTabletDriver.linux-x64.tar.gz
+  debian:
     runs-on: ubuntu-latest
     name: Debian Release
     steps:
@@ -26,20 +59,69 @@ jobs:
         with:
           dotnet-version: 5.0.x
       - name: Debian Build
-        run: ./Debian/package build
+        run: ./Debian/package
       - name: Generic Linux Build
-        run: ./Linux/package build
-      - name: Tree
-        run: tree ./
+        run: ./Linux/package
       - name: Upload release assets
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             ./Debian/OpenTabletDriver.deb
-            ./Linux/OpenTabletDriver.linux-x64.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@master
+        if: ! startsWith(github.ref, 'refs/tags/')
+        with:
+          name: OpenTabletDriver.deb
+          path: ./Debian/OpenTabletDriver.deb
+  redhat:
+    runs-on: ubuntu-latest
+    name: Red Hat Linux
+    steps:
+      - name: Checkout Packaging Repository
+        uses: actions/checkout@v2
+        with:
+          repository: 'OpenTabletDriver/OpenTabletDriver.Packaging'
+      - name: Checkout OpenTabletDriver Repository
+        uses: actions/checkout@v2
+        with:
+          repository: 'OpenTabletDriver/OpenTabletDriver'
+          path: 'src/OpenTabletDriver'
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Install Red Hat Dependencies
+        with:
+          DEPENDENCIES: [
+             "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/rpm-common_4.14.1+dfsg1-2_amd64.deb"
+             "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpm8_4.14.1+dfsg1-2_amd64.deb"
+             "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpmio8_4.14.1+dfsg1-2_amd64.deb"
+             "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpmbuild8_4.14.1+dfsg1-2_amd64.deb"
+          ] 
+        run: |
+          PACKAGES=$(mktemp -d)
+          for package in $DEPENDENCIES; do
+            wget $package -O $PACKAGES
+          done
+      - name: Red Hat Build
+        run: ./Redhat/package
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            ./Redhat/OpenTabletDriver.rpm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@master
+        if: ! startsWith(github.ref, 'refs/tags/')
+        with:
+          name: OpenTabletDriver.rpm
+          path: ./Redhat/OpenTabletDriver.rpm
   macos:
     runs-on: ubuntu-latest
     name: MacOS Release
@@ -53,18 +135,12 @@ jobs:
         with:
           repository: 'OpenTabletDriver/OpenTabletDriver'
           path: 'src/OpenTabletDriver'
-      - name: Checkout OpenTabletDriver-udev Repository
-        uses: actions/checkout@v2
-        with:
-          repository: 'OpenTabletDriver/OpenTabletDriver-udev'
-          path: 'src/OpenTabletDriver-udev'
-          submodules: false
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.x
       - name: MacOS Build
-        run: ./MacOS/package build
+        run: ./MacOS/package
       - name: Upload release assets
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -73,6 +149,12 @@ jobs:
             ./MacOS/OpenTabletDriver.osx-x64.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@master
+        if: ! startsWith(github.ref, 'refs/tags/')
+        with:
+          name: OpenTabletDriver.osx-x64.tar.gz
+          path: ./MacOS/OpenTabletDriver.osx-x64.tar.gz
   windows:
     runs-on: windows-latest
     name: Windows Release
@@ -100,3 +182,9 @@ jobs:
             ./Windows/OpenTabletDriver.win-x64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@master
+        if: ! startsWith(github.ref, 'refs/tags/')
+        with:
+          name: OpenTabletDriver.win-x64.zip
+          path: ./Windows/OpenTabletDriver.win-x64.zip
