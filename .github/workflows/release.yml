@@ -94,18 +94,14 @@ jobs:
         with:
           dotnet-version: 5.0.x
       - name: Install Red Hat Dependencies
-        with:
-          DEPENDENCIES: [
-             "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/rpm-common_4.14.1+dfsg1-2_amd64.deb"
-             "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpm8_4.14.1+dfsg1-2_amd64.deb"
-             "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpmio8_4.14.1+dfsg1-2_amd64.deb"
-             "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpmbuild8_4.14.1+dfsg1-2_amd64.deb"
-          ] 
         run: |
           PACKAGES=$(mktemp -d)
-          for package in $DEPENDENCIES; do
-            wget $package -O $PACKAGES
-          done
+          wget "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/rpm-common_4.14.1+dfsg1-2_amd64.deb" -O $PACKAGES/
+          wget "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpm8_4.14.1+dfsg1-2_amd64.deb" -O $PACKAGES/
+          wget "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpmio8_4.14.1+dfsg1-2_amd64.deb" -O $PACKAGES/
+          wget "http://mirrors.kernel.org/ubuntu/pool/universe/r/rpm/librpmbuild8_4.14.1+dfsg1-2_amd64.deb" -O $PACKAGES/
+          sudo apt update
+          sudo apt install $PACKAGES/*.deb -y
       - name: Red Hat Build
         run: ./Redhat/package
       - name: Upload release assets
