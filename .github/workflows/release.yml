@@ -104,6 +104,8 @@ jobs:
           sudo apt install rpm-common librpm8 librpmio8 librpmbuild8
       - name: Red Hat Build
         run: ./Redhat/package
+      - name: Tree
+        run: tree $(readlink -f .)
       - name: Upload release assets
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
