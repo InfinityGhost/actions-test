@@ -74,6 +74,8 @@ jobs:
     env:
       VERSION_SUFFIX: ${{ github.event.inputs.version_suffix }}
     steps:
+      - name: Install dependencies
+        run: brew install coreutils
       - name: Checkout Packaging Repository
         uses: actions/checkout@v2
         with:
