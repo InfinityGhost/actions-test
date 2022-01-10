@@ -75,7 +75,9 @@ jobs:
       VERSION_SUFFIX: ${{ github.event.inputs.version_suffix }}
     steps:
       - name: Install dependencies
-        run: brew install coreutils
+        run: |
+          brew install coreutils
+          alias readlink=greadlink
       - name: Checkout Packaging Repository
         uses: actions/checkout@v2
         with:
