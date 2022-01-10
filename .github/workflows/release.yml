@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version_suffix:
-        description: 'The version suffix to be applied.'
+        description: 'The version suffix for this manual build.'
         required: false
   release:
     types: [ published ]
@@ -35,10 +35,8 @@ jobs:
         run: ./Redhat/package
       - name: Generic Linux Build
         run: ./Linux/package
-      - name: MacOS Build
-        run: ./MacOS/package
 
-      - name: Upload release assets
+      - name: Upload all assets (Release)
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
@@ -46,37 +44,65 @@ jobs:
             ./Debian/OpenTabletDriver.deb
             ./Redhat/OpenTabletDriver.rpm
             ./Linux/OpenTabletDriver.linux-x64.tar.gz
-            ./MacOS/OpenTabletDriver.osx-x64.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Debian asset
+      - name: Upload Debian asset (Dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@master
         with:
           name: OpenTabletDriver.deb
           path: ./Debian/OpenTabletDriver.deb
 
-      - name: Upload RPM asset
+      - name: Upload RPM asset (Dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@master
         with:
           name: OpenTabletDriver.rpm
           path: ./Redhat/OpenTabletDriver.rpm
 
-      - name: Upload generic Linux asset
+      - name: Upload generic Linux asset (Dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@master
         with:
           name: OpenTabletDriver.linux-x64.tar.gz
           path: ./Linux/OpenTabletDriver.linux-x64.tar.gz
 
-      - name: Upload macOS asset
+  macos:
+    runs-on: macos-latest
+    name: macOS Release
+    env:
+      VERSION_SUFFIX: ${{ github.event.inputs.version_suffix }}
+    steps:
+      - name: Checkout Packaging Repository
+        uses: actions/checkout@v2
+        with:
+          repository: 'OpenTabletDriver/OpenTabletDriver.Packaging'
+      - name: Checkout OpenTabletDriver Repository
+        uses: actions/checkout@v2
+        with:
+          repository: 'OpenTabletDriver/OpenTabletDriver'
+          path: 'src/OpenTabletDriver'
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0'
+          include-prerelease: True
+      - name: macOS Build
+        run: ./MacOS/package
+      - name: Upload macOS asset (Dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@master
         with:
           name: OpenTabletDriver.osx-x64.tar.gz
           path: ./MacOS/OpenTabletDriver.osx-x64.tar.gz
+      - name: Upload macOS assets (Release)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ./MacOS/OpenTabletDriver.osx-x64.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   windows:
     runs-on: windows-latest
@@ -101,7 +127,7 @@ jobs:
       - name: Package
         run: ./Windows/package.ps1
 
-      - name: Upload release assets
+      - name: Upload Windows asset (Release)
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
@@ -109,7 +135,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Windows asset
+      - name: Upload Windows asset (Dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@master
         with:
