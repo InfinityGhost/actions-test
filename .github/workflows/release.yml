@@ -91,9 +91,7 @@ jobs:
           dotnet-version: '6.0'
           include-prerelease: True
       - name: macOS Build
-        run: |
-          alias readlink=greadlink
-          ./MacOS/package
+        run: ./MacOS/package
       - name: Upload macOS asset (Dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@master
