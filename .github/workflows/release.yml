@@ -75,9 +75,7 @@ jobs:
       VERSION_SUFFIX: ${{ github.event.inputs.version_suffix }}
     steps:
       - name: Install dependencies
-        run: |
-          brew install coreutils
-          alias readlink=greadlink
+        run: brew install coreutils
       - name: Checkout Packaging Repository
         uses: actions/checkout@v2
         with:
@@ -93,7 +91,9 @@ jobs:
           dotnet-version: '6.0'
           include-prerelease: True
       - name: macOS Build
-        run: ./MacOS/package
+        run: |
+          alias readlink=greadlink
+          ./MacOS/package
       - name: Upload macOS asset (Dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@master
